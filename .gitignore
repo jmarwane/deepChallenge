@@ -1,5 +1,6 @@
 /config.json
 /.venv
+/.w-venv
 
 *.pyc
 __pycache__
