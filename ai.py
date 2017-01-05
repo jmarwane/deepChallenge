@@ -69,7 +69,7 @@ def allowed_non_capture_moves(board,currentCase,isKing):
 
     return allowed_paths
 
-def allowed_paths(board, color):
+def allowed_moves(board, color):
     """
         All possible moves for player "color" for a given board
     """
