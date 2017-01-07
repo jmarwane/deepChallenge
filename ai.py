@@ -1,4 +1,5 @@
 import random
+import time
 
 def find_color_discs(board,color):
     """
@@ -101,18 +102,12 @@ def play(board, color):
         Play must return the next move to play.
         You can define here any strategy you would find suitable.
     """
-    if color=='b': opposit_color='w'
-    else : opposit_color='b'
+    start_time=time.time()
+    max_time=10
+    best_move=find_best_move(board,color,start_time,max_time)[1]
+    print('Execution time : {}'.format(time.time()-start_time))
 
-    moves=allowed_moves(board,color)
-    max_length=0
-    for move in moves:
-        if len(move)>max_length:
-            max_length=len(move)
-
-    moves=list(filter(lambda x:len(x)==max_length,moves))
-
-    return random.choice(moves)
+    return best_move
 
 def simulate_play(board,move):
     updated_board=board
@@ -125,12 +120,32 @@ def simulate_play(board,move):
 
     return updated_board
 
-def random_play(board, color):
-    """
-        An example of play function based on allowed_paths.
-    """
-    moves = allowed_moves(board, color)
-    # There will always be an allowed move
-    # because otherwise the game is over and
-    # 'play' would not be called by main.py
-    return random.choice(moves)
+def find_best_move(board,color,start_time,max_time):
+    if color=='b': opposit_color='w'
+    else : opposit_color='b'
+
+    moves = allowed_moves(board,color)
+    random.shuffle(moves)
+    if time.time()-start_time>max_time or len(moves)==0:
+        return [evaluate_score(board,color,opposit_color)]
+
+    best_move = moves[0]
+    best_score = float('-inf')
+    # for move in moves:
+    for i in range(len(moves)):
+        move=moves[i]
+        clone = simulate_play(board,move)
+        score = find_best_move(clone,opposit_color,start_time,max_time)[0]
+        if score > best_score:
+            best_move = move
+            best_score = score
+
+    return [best_score,best_move]
+
+def evaluate_score(board,color,opposit_color):
+    if len(allowed_moves(board,color))==0:
+        return float('-inf')
+    if len(allowed_moves(board,opposit_color))==0:
+        return float('inf')
+
+    return len(find_color_discs(board,color))-len(find_color_discs(board,opposit_color))
